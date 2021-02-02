@@ -2,6 +2,7 @@ package com.example.swipeunlock;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.PointF;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -11,6 +12,11 @@ import android.view.InputEvent;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
 import android.view.View;
+import android.widget.SeekBar;
+import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnTouchListener {
 
@@ -21,6 +27,14 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
     float oldX, oldY;
     float newX, newY;
     private VelocityTracker mVelocityTracker = null;
+    private SeekBar seekBar;
+    private long startTime, endTime;
+
+    private Swipe swipe;
+
+    private Data db;
+    private List<Swipe> swipeList;
+
 
 
     @Override
@@ -28,10 +42,72 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        db = new Data(MainActivity.this);
 
-        Log.d(TAG, "duration: " + duration);
-        Log.d(TAG, "start point: " + oldX + "--" + oldY);
-        Log.d(TAG, "end point: " + newX + "--" + newY);
+
+        seekBar = (SeekBar) findViewById(R.id.seekBar);
+
+        swipe = new Swipe();
+        swipeList = new ArrayList<>();
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+            }
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+                seekBar.setOnTouchListener(new View.OnTouchListener() {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        int action = event.getAction();
+                        if (action == MotionEvent.ACTION_DOWN)    {
+                            float x = event.getX();
+                            float y = event.getY();
+                            float pressure = event.getPressure();
+                            swipe.setStartPointX(x);
+                            swipe.setStartPointY(y);
+                            swipe.setPressure(pressure);
+                            startTime = System.currentTimeMillis();
+                        }
+
+                        if (action == MotionEvent.ACTION_UP)    {
+                            float x = event.getX();
+                            float y = event.getY();
+                            endTime = System.currentTimeMillis();
+                            long duration = endTime - startTime;
+                            swipe.setEndPointX(x);
+                            swipe.setEndPointY(y);
+                            swipe.setDuration(duration);
+                            Toast.makeText(MainActivity.this, "Password has been recorded", Toast.LENGTH_SHORT).show();
+//                            Log.d(TAG, "start  point: " + swipe.getStartPointX() + " " + swipe.getStartPointY());
+//                            Log.d(TAG, "Duration and Pressure: " + swipe.getDuration() + " " + swipe.getPressure());
+//                            Log.d(TAG, "End Points: " + swipe.getEndPointX() + " " + swipe.getEndPointY());
+                            if (swipe.getPressure() != 0)   db.addSwipe(swipe);
+                        }
+
+                        return false;
+                    }
+                });
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+
+        });
+
+    swipeList = db.getSwipeInfo();
+    if (swipeList.size() > 0)   {
+        for (int i = 0; i < swipeList.size(); i++)  {
+            Swipe swipe = new Swipe();
+            Log.d(TAG, "KEY -> " + i);
+            Log.d(TAG, "------------ ");
+            Log.d(TAG, swipeList.get(i).getStartPointX() + " ___ " + swipeList.get(i).getStartPointY());
+            Log.d(TAG, swipeList.get(i).getDuration() + "___ " + swipeList.get(i).getPressure());
+            Log.d(TAG, "------------");
+        }
+    }
 
     }
 
