@@ -15,8 +15,11 @@ import android.view.View;
 import android.widget.SeekBar;
 import android.widget.Toast;
 
+
 import java.util.ArrayList;
 import java.util.List;
+
+import weka.core.Attribute;
 
 public class MainActivity extends AppCompatActivity implements View.OnTouchListener {
 
@@ -82,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 //                            Log.d(TAG, "start  point: " + swipe.getStartPointX() + " " + swipe.getStartPointY());
 //                            Log.d(TAG, "Duration and Pressure: " + swipe.getDuration() + " " + swipe.getPressure());
 //                            Log.d(TAG, "End Points: " + swipe.getEndPointX() + " " + swipe.getEndPointY());
-                            if (swipe.getPressure() != 0)   db.addSwipe(swipe);
+                            if (swipe.getPressure() != 0)   db.addSwipe(swipe, getApplicationContext());
                         }
 
                         return false;
@@ -97,6 +100,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
         });
 
+
     swipeList = db.getSwipeInfo();
     if (swipeList.size() > 0)   {
         for (int i = 0; i < swipeList.size(); i++)  {
@@ -105,6 +109,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
             Log.d(TAG, "------------ ");
             Log.d(TAG, swipeList.get(i).getStartPointX() + " ___ " + swipeList.get(i).getStartPointY());
             Log.d(TAG, swipeList.get(i).getDuration() + "___ " + swipeList.get(i).getPressure());
+            Log.d(TAG, swipeList.get(i).getEndPointX() + "___" + swipeList.get(i).getEndPointY());
             Log.d(TAG, "------------");
         }
     }

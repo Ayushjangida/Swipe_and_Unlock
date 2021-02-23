@@ -6,9 +6,14 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +24,7 @@ public class Data extends SQLiteOpenHelper {
     private final Context context;
 
     private final String TAG = "DB";
+    private String fileName = "Data";
 
 
     public Data(@Nullable Context context) {
@@ -50,7 +56,7 @@ public class Data extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    void addSwipe(Swipe swipe)  {
+    void addSwipe(Swipe swipe, Context context)  {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -62,9 +68,23 @@ public class Data extends SQLiteOpenHelper {
         values.put(SwipeConstants.END_POINT_Y, swipe.getEndPointY());
 
         db.insert(SwipeConstants.TABLE_SWIPES, null, values);
+        String string = swipe.getStartPointX() + "," + swipe.getStartPointY() + "," + swipe.getDuration() + "," + swipe.getPressure()
+        + "," + swipe.getEndPointX() + "," + swipe.getEndPointY();
+        try {
+            FileOutputStream fos = context.openFileOutput(fileName, Context.MODE_PRIVATE);
+            OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fos);
+            outputStreamWriter.write(string);
+            outputStreamWriter.close();
+            Log.d(TAG, "File saved successfully");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         Log.d(TAG, "Swipe info added to the database successfully");
         db.close();
     }
+
 
     public List<Swipe> getSwipeInfo()   {
         SQLiteDatabase db = this.getReadableDatabase();
