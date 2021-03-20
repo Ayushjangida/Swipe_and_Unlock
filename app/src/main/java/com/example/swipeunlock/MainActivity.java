@@ -171,20 +171,7 @@ public class MainActivity extends AppCompatActivity implements View.OnTouchListe
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-//        if(event.getAction() == MotionEvent.ACTION_DOWN){
-//            oldX = event.getX();
-//            oldY = event.getY();
-//            pressTime = System.currentTimeMillis();
-//            if(releaseTime != -1l) duration = pressTime - releaseTime;
-//        }
-//        else if(event.getAction() == MotionEvent.ACTION_UP){
-//            newX = event.getX();
-//            newY = event.getY();
-//            releaseTime = System.currentTimeMillis();
-//            duration = System.currentTimeMillis() - pressTime;
-//        }
 //
-//        Log.d(TAG, "duration: " + duration);
         return true;
     }
 }
